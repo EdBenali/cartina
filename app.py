@@ -1,3 +1,4 @@
+from constants import BLACK, RED
 from enums import Suit, Rank, Ranks, Suits
 import pygame
 from pygame.locals import *
@@ -12,10 +13,8 @@ from pygame.locals import *
 #   - Clean up styling, better card sprites, better background, Balatro-esq?
 #   - Add multiplayer? Online/Local
 #   - Export to other languages for distribution
-#
-
-RED = pygame.Color((255, 0, 0, 255))
-BLACK = pygame.Color((0, 0, 0, 255))
+#   - Tech debt:
+#       - Handle smaller resolutions
 
 
 class App:
@@ -29,7 +28,7 @@ class App:
             [self.max_w, self.max_h],
             pygame.RESIZABLE
         )
-        pygame.display.set_caption('Carto')
+        pygame.display.set_caption('Cartina')
 
         self.bg = BLACK
 
@@ -49,7 +48,7 @@ class App:
 
         running = True
 
-        self.entities.append(Card(Suits.Spades, Ranks.Ace))
+        self.entities.append(Card(Suits.Spades.value, Ranks.Ace.value))
 
         while running:
             self._draw_scene()
@@ -76,7 +75,7 @@ class App:
 
         pygame.quit()
 
-    def _draw_scene(self):
+    def _draw_scene(self, show_collision_bounderies=False):
         """
         Handles updating the screen and redrawing all scene elements.
         """
@@ -86,7 +85,10 @@ class App:
         # Draw Entities
         for entity in self.entities:
             self.screen.blit(entity.image, (entity.rect.x, entity.rect.y))
-            pygame.draw.rect(self.screen, RED, entity.rect, 1)
+
+            # Debugging tool
+            if show_collision_bounderies:
+                pygame.draw.rect(self.screen, RED, entity.rect, 1)
 
     def _handle_mouse_interaction(self,
                                   mouse_x: int,
@@ -101,19 +103,19 @@ class App:
         """
         for entity in self.entities:
             if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
-                entity.rect.x = mouse_x - (entity.rect.WIDTH / 2)
-                entity.rect.y = mouse_y - (entity.rect.HEIGHT / 2)
+                entity.rect.x = mouse_x - (entity.rect.width / 2)
+                entity.rect.y = mouse_y - (entity.rect.height / 2)
 
 
 class Card(pygame.sprite.Sprite):
     """
     Basic card class this handles card game data.
     """
-    def __init__(self, suit: Suit, val: Rank):
+    def __init__(self, suit: Suit, rank: Rank):
         pygame.sprite.Sprite.__init__(self)
 
         self.suit = suit
-        self.val = val
+        self.rank = rank
 
         self.image = self.__construct_sprite()
         self.rect = pygame.Rect(
@@ -122,9 +124,9 @@ class Card(pygame.sprite.Sprite):
             self.image.get_width(),
             self.image.get_height())
 
-
     def __construct_sprite(self):
-        return pygame.image.load("assets/ace_of_spades.png").convert()
+        return pygame.image.load(
+            f"assets/{self.rank.symbol}_of_{self.suit.value}.png").convert()
 
 
 def _float_to_int8(f: float):
