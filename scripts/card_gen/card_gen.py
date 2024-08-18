@@ -61,24 +61,24 @@ SYMBOL_POSITIONS = {
     ],
     9: [
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] - (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] + (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] - SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] + SYMBOL_SIZE // 4),
         (CARD_CENTRE[0], CARD_CENTRE[1]),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] - SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] + SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] - (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] + (SYMBOL_SIZE //
-         4) * 3)
+                                                              4) * 3)
     ],
     10: [
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] - (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] + (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] - SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] + SYMBOL_SIZE // 2, CARD_CENTRE[1] + SYMBOL_SIZE // 4),
         (CARD_CENTRE[0], CARD_CENTRE[1] + SYMBOL_SIZE // 2),
@@ -86,9 +86,9 @@ SYMBOL_POSITIONS = {
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] - SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] + SYMBOL_SIZE // 4),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] - (SYMBOL_SIZE //
-         4) * 3),
+                                                              4) * 3),
         (CARD_CENTRE[0] - SYMBOL_SIZE // 2, CARD_CENTRE[1] + (SYMBOL_SIZE //
-         4) * 3)
+                                                              4) * 3)
     ]
 }
 
@@ -150,13 +150,18 @@ def _draw_rank(rank: Rank, draw: ImageDraw, colour: tuple):
         fill=colour)
 
 
-def _draw_suit(suit: Suit, draw: ImageDraw, rank: Rank):
+def _draw_suit(suit: Suit, draw: ImageDraw, rank: Rank, ):
     # Draw the suit symbol
     draw_suit_func = DRAW_SUIT_FUNCS[suit.value]
 
-    # Aces and Faces
-    # TODO handle face gen
-    if rank.group == RankGroup.Face:
+    # Aces
+    if rank.group == RankGroup.Ace:
+        draw_suit_func(
+            symbol_pos=CARD_CENTRE,
+            symbol_size=SYMBOL_SIZE,
+            colour=suit.colour,
+            draw=draw)
+    elif rank.group == RankGroup.Face:
         draw_suit_func(
             symbol_pos=CARD_CENTRE,
             symbol_size=SYMBOL_SIZE,
@@ -173,14 +178,15 @@ def _draw_suit(suit: Suit, draw: ImageDraw, rank: Rank):
                 symbol_size=SYMBOL_SIZE // 3,
                 colour=suit.colour,
                 draw=draw)
-
+    else:
+        raise ValueError(f"Unkown rank group passed to _draw_suit: "
+                         f"{RankGroup.Ace.value}")
 
 
 def _draw_spades(symbol_pos: tuple,
                  symbol_size: int,
                  colour: tuple,
                  draw: ImageDraw):
-
     triangle = [
         (symbol_pos[0], symbol_pos[1] - symbol_size // 2),  # Top
         (symbol_pos[0] - symbol_size // 2,
@@ -220,20 +226,63 @@ def _draw_spades(symbol_pos: tuple,
     draw.rectangle(
         xy=[symbol_pos[0] - symbol_size // 10, symbol_pos[1] + symbol_size // 2
             - symbol_size // 10,
-         symbol_pos[0] + symbol_size // 10, symbol_pos[1] + symbol_size // 2 +
+            symbol_pos[0] + symbol_size // 10,
+            symbol_pos[1] + symbol_size // 2 +
             (symbol_size // 10) * 4],
         fill=colour
     )
 
-def _draw_diamonds():
+
+def _draw_diamonds(symbol_pos: tuple,
+                   symbol_size: int,
+                   colour: tuple,
+                   draw: ImageDraw):
     pass
 
-def _draw_hearts():
-    pass
 
-def _draw_clubs():
-    pass
+def _draw_hearts(symbol_pos: tuple,
+                 symbol_size: int,
+                 colour: tuple,
+                 draw: ImageDraw):
+    triangle = [
+        (symbol_pos[0], symbol_pos[1] + symbol_size // 2),  # Bottom
+        (symbol_pos[0] + symbol_size // 2,
+         symbol_pos[1] - symbol_size // 2),
+        # Top left
+        (symbol_pos[0] + symbol_size // 2,
+         symbol_pos[1] - symbol_size // 2),
+        (symbol_pos[0] - symbol_size // 2,
+         symbol_pos[1] - symbol_size // 2)
+        # Top right
+    ]
+    draw.polygon(xy=triangle, fill=colour)
 
+    # Draw left slice
+    l_slice = [
+        (symbol_pos[0] - symbol_size // 2, symbol_pos[1] - symbol_size +
+         symbol_size // 4),
+        (symbol_pos[0], symbol_pos[1] - symbol_size // 4)]
+    draw.pieslice(
+        xy=l_slice,
+        start=180,
+        end=360,
+        fill=colour)
+
+    # Draw right slice
+    r_slice = [(symbol_pos[0], symbol_pos[1] - symbol_size + symbol_size // 4),
+               (symbol_pos[0] + symbol_size // 2, symbol_pos[1] - symbol_size // 4)]
+    draw.pieslice(
+        xy=r_slice,
+        start=180,
+        end=360,
+        fill=colour)
+
+
+def _draw_clubs(symbol_pos: tuple,
+                symbol_size: int,
+                colour: tuple,
+                draw: ImageDraw):
+    pass
 
 
 DRAW_SUIT_FUNCS = {
@@ -243,14 +292,7 @@ DRAW_SUIT_FUNCS = {
     Suits.Clubs.value.value: _draw_clubs
 }
 
-
-
 if __name__ == "__main__":
-    for r in [
-        Ranks.Ace,
-        # Ranks.Two,
-        # Ranks.Three, Ranks.Four, Ranks.Five, Ranks.Six,
-        #       Ranks.Seven, Ranks.Eight, Ranks.Nine,
-        #       Ranks.Ten
-    ]:
-        generate_card_image(Suits.Spades.value, r.value)
+    for r in [Ranks.Ace]:
+        # for s in Suits:
+        generate_card_image(Suits.Hearts.value, r.value)

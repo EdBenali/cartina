@@ -10,6 +10,7 @@ class Suit:
 class RankGroup(Enum):
     Face = 'Face'
     Number = 'Number'
+    Ace = 'Ace'
 
 class Rank:
     def __init__(self, symbol: str, group: RankGroup):
@@ -23,7 +24,7 @@ class Suits(Enum):
     Spades = Suit('Spades', BLACK)
 
 class Ranks(Enum):
-    Ace = Rank(symbol='A', group=RankGroup.Face)
+    Ace = Rank(symbol='A', group=RankGroup.Ace)
     Two = Rank(symbol='2', group=RankGroup.Number)
     Three = Rank(symbol='3', group=RankGroup.Number)
     Four = Rank(symbol='4', group=RankGroup.Number)
