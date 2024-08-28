@@ -2,6 +2,7 @@ from constants import BLACK, RED, TITLE
 from enums import Suit, Rank, Ranks, Suits
 import pygame
 from pygame.locals import *
+import random
 
 # TODO:
 #   - Add set screen regions, eg hand, play area, deck
@@ -13,23 +14,37 @@ from pygame.locals import *
 #   - Tech debt:
 #       - Handle smaller resolutions
 
+global max_w
+global max_h
+global screen
+
 
 class App:
     def __init__(self):
         pygame.init()
 
+        global max_w
+        global max_h
+        global screen
+
         display_info = pygame.display.Info()
-        self.max_w = display_info.current_w
-        self.max_h = display_info.current_h
-        self.screen = pygame.display.set_mode(
-            [self.max_w, self.max_h],
+        max_w = display_info.current_w
+        max_h = display_info.current_h
+        screen = pygame.display.set_mode(
+            [max_w, max_h],
             pygame.RESIZABLE
         )
         pygame.display.set_caption('Cartina')
 
         self.bg = BLACK
 
-        self.entities = []
+        self.deck = Deck()
+        self.deck.add_standard_deck()
+        self.deck.shuffle()
+
+        self.hand = []
+
+        self.entities = [self.deck]
 
     def main_loop(self):
         """
@@ -45,7 +60,7 @@ class App:
 
         running = True
 
-        self.entities.append(Card(Suits.Spades.value, Ranks.Ace.value))
+        # self.entities.append(Card(Suits.Spades.value, Ranks.Ace.value))
 
         while running:
             self._draw_scene()
@@ -64,8 +79,7 @@ class App:
 
                 if event.type == KEYDOWN:
                     if event.key == K_w:
-                        self.entities.append(Card(Suits.Hearts.value,
-                                                  Ranks.Seven.value))
+                        self.entities.append(self.deck.draw())
 
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
@@ -83,16 +97,18 @@ class App:
         """
         Handles updating the screen and redrawing all scene elements.
         """
+        global screen
+
         # Draw background
-        self.screen.fill(self.bg)
+        screen.fill(self.bg)
 
         # Draw Entities
         for entity in self.entities:
-            self.screen.blit(entity.image, (entity.rect.x, entity.rect.y))
+            screen.blit(entity.image, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
             if show_collision_boundaries:
-                pygame.draw.rect(self.screen, RED, entity.rect, 1)
+                pygame.draw.rect(screen, RED, entity.rect, 1)
 
     def _handle_mouse_interaction(self,
                                   mouse_x: int,
@@ -105,10 +121,11 @@ class App:
         :param mouse_y: int,
         :param clicked: bool
         """
-        for entity in self.entities:
-            if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
-                entity.rect.x = mouse_x - (entity.rect.width / 2)
-                entity.rect.y = mouse_y - (entity.rect.height / 2)
+        ## Dragging
+        # for entity in self.entities:
+        #     if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
+        #         entity.rect.x = mouse_x - (entity.rect.width / 2)
+        #         entity.rect.y = mouse_y - (entity.rect.height / 2)
 
 
 class Card(pygame.sprite.Sprite):
@@ -132,6 +149,38 @@ class Card(pygame.sprite.Sprite):
         return pygame.image.load(
             f"assets/card_gen/{self.rank.symbol}_of"
             f"_{self.suit.value}.png").convert()
+
+
+class Deck(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        global screen
+
+        self.image = pygame.image.load(
+            f"assets/card_gen/card_back.png").convert()
+
+        self.rect = pygame.Rect(
+            screen.get_width() // 2,
+            screen.get_height() // 2,
+            self.image.get_width(),
+            self.image.get_height())
+
+        self.__cards = []
+
+    def draw(self) -> Card:
+        if len(self.__cards) > 0:
+            return self.__cards.pop()
+        else:
+            pass
+
+    def add_standard_deck(self):
+        for s in Suits:
+            for r in Ranks:
+                self.__cards.append(Card(suit=s.value, rank=r.value))
+
+    def shuffle(self):
+        random.shuffle(self.__cards)
 
 
 def _float_to_int8(f: float):

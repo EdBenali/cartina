@@ -7,21 +7,25 @@ class Suit:
         self.value = value
         self.colour = colour
 
+
 class RankGroup(Enum):
     Face = 'Face'
     Number = 'Number'
     Ace = 'Ace'
+
 
 class Rank:
     def __init__(self, symbol: str, group: RankGroup):
         self.symbol = symbol
         self.group = group
 
+
 class Suits(Enum):
     Clubs = Suit('Clubs', BLACK)
     Diamonds = Suit('Diamonds', RED)
     Hearts = Suit('Hearts', RED)
     Spades = Suit('Spades', BLACK)
+
 
 class Ranks(Enum):
     Ace = Rank(symbol='A', group=RankGroup.Ace)
