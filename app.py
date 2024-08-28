@@ -1,12 +1,9 @@
-from constants import BLACK, RED
+from constants import BLACK, RED, TITLE
 from enums import Suit, Rank, Ranks, Suits
 import pygame
 from pygame.locals import *
 
 # TODO:
-#   - Add card generation system
-#       - Can we layer sprites on the fly, make composites? Or should we make
-#       a new asset for each card combo?
 #   - Add set screen regions, eg hand, play area, deck
 #   - Add game logic, win states, rounds, card dealing
 #       - Add bots for solo play?
@@ -40,7 +37,7 @@ class App:
 
 
         """
-        fps = 144
+        # fps = 144
         fps_clock = pygame.time.Clock()
 
         mouse_x, mouse_y = 0, 0
@@ -65,17 +62,24 @@ class App:
                 elif event.type == MOUSEBUTTONUP:
                     clicked = False
 
+                if event.type == KEYDOWN:
+                    if event.key == K_w:
+                        self.entities.append(Card(Suits.Hearts.value,
+                                                  Ranks.Seven.value))
+
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
                 mouse_y=mouse_y,
                 clicked=clicked)
 
             pygame.display.update()
-            fps_clock.tick(fps)
+            fps_clock.tick()
+            pygame.display.set_caption(f'{TITLE}    fps:'
+                                       f'{int(fps_clock.get_fps())}')
 
         pygame.quit()
 
-    def _draw_scene(self, show_collision_bounderies=False):
+    def _draw_scene(self, show_collision_boundaries=False):
         """
         Handles updating the screen and redrawing all scene elements.
         """
@@ -87,7 +91,7 @@ class App:
             self.screen.blit(entity.image, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
-            if show_collision_bounderies:
+            if show_collision_boundaries:
                 pygame.draw.rect(self.screen, RED, entity.rect, 1)
 
     def _handle_mouse_interaction(self,
@@ -126,7 +130,8 @@ class Card(pygame.sprite.Sprite):
 
     def __construct_sprite(self):
         return pygame.image.load(
-            f"assets/{self.rank.symbol}_of_{self.suit.value}.png").convert()
+            f"assets/card_gen/{self.rank.symbol}_of"
+            f"_{self.suit.value}.png").convert()
 
 
 def _float_to_int8(f: float):

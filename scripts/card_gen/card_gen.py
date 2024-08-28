@@ -1,9 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 
-from constants import TRANSPARENT, WHITE
 from enums import Rank, Suit, Suits, Ranks, RankGroup
+from scripts.card_utils import CARD_WIDTH, CARD_HEIGHT, create_blank_card
 
-CARD_WIDTH, CARD_HEIGHT = 256, 384
 SYMBOL_SIZE = CARD_WIDTH // 2
 CARD_CENTRE = (CARD_WIDTH // 2, CARD_HEIGHT // 2)
 
@@ -93,18 +92,8 @@ SYMBOL_POSITIONS = {
 }
 
 
-def generate_card_image(suit: Suit, rank: Rank):
-    background_color = TRANSPARENT  # White background
-
-    # Create a blank image
-    img = Image.new('RGBA', (CARD_WIDTH, CARD_HEIGHT), color=background_color)
-    draw = ImageDraw.Draw(img)
-
-    # Draw background
-    ellipse_margin = CARD_WIDTH // 5
-    ellipse = [(-ellipse_margin, -ellipse_margin),
-               (CARD_WIDTH + ellipse_margin, CARD_HEIGHT + ellipse_margin)]
-    draw.ellipse(xy=ellipse, fill=WHITE)
+def generate_card_image(suit: Suit, rank: Rank, show_image: bool = False):
+    draw, img = create_blank_card()
 
     _draw_rank(rank=rank,
                draw=draw,
@@ -123,8 +112,9 @@ def generate_card_image(suit: Suit, rank: Rank):
     # Save the image
     img.save(f"card_images/{rank.symbol}_of_{suit.value}.png")
 
-    # Show the image (optional)
-    img.show()
+    if show_image:
+        # Show the image (optional)
+        img.show()
 
 
 def _draw_rank(rank: Rank, draw: ImageDraw, colour: tuple):
@@ -237,7 +227,13 @@ def _draw_diamonds(symbol_pos: tuple,
                    symbol_size: int,
                    colour: tuple,
                    draw: ImageDraw):
-    pass
+    diamond = [
+        (symbol_pos[0], symbol_pos[1] - symbol_size // 1.6),  # Top
+        (symbol_pos[0] + symbol_size // 2, symbol_pos[1]),  # Right
+        (symbol_pos[0], symbol_pos[1] + symbol_size // 1.6),  # Bottom
+        (symbol_pos[0] - symbol_size // 2, symbol_pos[1])  # Left
+    ]
+    draw.polygon(xy=diamond, fill=colour)
 
 
 def _draw_hearts(symbol_pos: tuple,
@@ -270,7 +266,8 @@ def _draw_hearts(symbol_pos: tuple,
 
     # Draw right slice
     r_slice = [(symbol_pos[0], symbol_pos[1] - symbol_size + symbol_size // 4),
-               (symbol_pos[0] + symbol_size // 2, symbol_pos[1] - symbol_size // 4)]
+               (symbol_pos[0] + symbol_size // 2,
+                symbol_pos[1] - symbol_size // 4)]
     draw.pieslice(
         xy=r_slice,
         start=180,
@@ -282,7 +279,30 @@ def _draw_clubs(symbol_pos: tuple,
                 symbol_size: int,
                 colour: tuple,
                 draw: ImageDraw):
-    pass
+    circle_coords = [
+        (symbol_pos[0], symbol_pos[1] - symbol_size // 4),  # Top
+        (symbol_pos[0] - symbol_size // 4,
+         symbol_pos[1] + symbol_size // 4),  # Bottom left
+        (symbol_pos[0] + symbol_size // 4,
+         symbol_pos[1] + symbol_size // 4)  # Bottom right
+    ]
+
+    for xy in circle_coords:
+        draw.circle(xy=xy,
+                    radius=symbol_size // 4,
+                    fill=colour)
+
+    draw.polygon(xy=circle_coords, fill=colour)
+
+    # Draw the spade tail
+    draw.rectangle(
+        xy=[
+            (symbol_pos[0] - symbol_size // 15, symbol_pos[1]),
+            (symbol_pos[0] + symbol_size // 15,
+            symbol_pos[1] + symbol_size // 2 + symbol_size // 10)
+        ],
+        fill=colour
+    )
 
 
 DRAW_SUIT_FUNCS = {
@@ -293,6 +313,6 @@ DRAW_SUIT_FUNCS = {
 }
 
 if __name__ == "__main__":
-    for r in [Ranks.Ace]:
-        # for s in Suits:
-        generate_card_image(Suits.Hearts.value, r.value)
+    for r in Ranks:
+        for s in Suits:
+            generate_card_image(s.value, r.value)
