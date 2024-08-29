@@ -121,6 +121,11 @@ class App:
         :param mouse_y: int,
         :param clicked: bool
         """
+        # Deck Click
+        if clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
+            # Add card to hand
+            self.hand.append(self.deck.draw())
+
         ## Dragging
         # for entity in self.entities:
         #     if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
@@ -160,11 +165,14 @@ class Deck(pygame.sprite.Sprite):
         self.image = pygame.image.load(
             f"assets/card_gen/card_back.png").convert()
 
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
         self.rect = pygame.Rect(
-            screen.get_width() // 2,
-            screen.get_height() // 2,
-            self.image.get_width(),
-            self.image.get_height())
+            screen.get_width() // 2 - self.width // 2,
+            screen.get_height() // 2 - self.height // 2,
+            self.width,
+            self.height)
 
         self.__cards = []
 
