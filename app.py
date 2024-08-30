@@ -4,17 +4,19 @@ import pygame
 from pygame.locals import *
 import random
 
-# TODO:
-#   - Add set screen regions, eg hand, play area, deck
-#       - Figure out how to centre the card objects
-#   - Add game logic, win states, rounds, card dealing
-#       - Add bots for solo play?
-#   - Clean up styling, better card sprites, better background, Balatro-esq?
-#       - Shader for bg (side quest)
-#   - Add multiplayer? Online/Local(bots/ai)
-#   - Export to other languages for distribution
-#   - Tech debt:
-#       - Handle smaller resolutions/ ensure any resolution/window size works
+"""
+TODO:
+  - Add set screen regions, eg hand, play area, deck
+      - Figure out how to centre the card objects
+  - Add game logic, win states, rounds, card dealing
+      - Add bots for solo play?
+  - Clean up styling, better card sprites, better background, Balatro-esq?
+      - Shader for bg (side quest)
+  - Add multiplayer? Online/Local(bots/ai)
+  - Export to other languages for distribution
+  - Tech debt:
+      - Handle smaller resolutions/ ensure any resolution/window size works
+"""
 
 global max_w
 global max_h
