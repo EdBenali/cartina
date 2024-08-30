@@ -44,7 +44,7 @@ class App:
 
         self.hand = []
 
-        self.entities = [self.deck]
+        self.entities = []
 
     def main_loop(self):
         """
@@ -60,7 +60,7 @@ class App:
 
         running = True
 
-        # self.entities.append(Card(Suits.Spades.value, Ranks.Ace.value))
+        self.entities.append(self.deck)
 
         while running:
             self._draw_scene()
@@ -78,8 +78,10 @@ class App:
                     clicked = False
 
                 if event.type == KEYDOWN:
-                    if event.key == K_w:
-                        self.entities.append(self.deck.draw())
+                    if event.key == K_d:
+                        card = self.deck.draw()
+                        self.entities.append(card)
+                        self.hand.append(card)
 
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
@@ -93,7 +95,7 @@ class App:
 
         pygame.quit()
 
-    def _draw_scene(self, show_collision_boundaries=False):
+    def _draw_scene(self, show_collision_boundaries=True):
         """
         Handles updating the screen and redrawing all scene elements.
         """
