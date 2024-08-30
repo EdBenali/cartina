@@ -6,13 +6,15 @@ import random
 
 # TODO:
 #   - Add set screen regions, eg hand, play area, deck
+#       - Figure out how to centre the card objects
 #   - Add game logic, win states, rounds, card dealing
 #       - Add bots for solo play?
 #   - Clean up styling, better card sprites, better background, Balatro-esq?
-#   - Add multiplayer? Online/Local
+#       - Shader for bg (side quest)
+#   - Add multiplayer? Online/Local(bots/ai)
 #   - Export to other languages for distribution
 #   - Tech debt:
-#       - Handle smaller resolutions
+#       - Handle smaller resolutions/ ensure any resolution/window size works
 
 global max_w
 global max_h
@@ -42,7 +44,7 @@ class App:
         self.deck.add_standard_deck()
         self.deck.shuffle()
 
-        self.hand = []
+        self.hand = Hand()
 
         self.entities = []
 
@@ -81,7 +83,7 @@ class App:
                     if event.key == K_d:
                         card = self.deck.draw()
                         self.entities.append(card)
-                        self.hand.append(card)
+                        self.hand.add_card(card)
 
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
@@ -126,7 +128,9 @@ class App:
         # Deck Click
         if clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
             # Add card to hand
-            self.hand.append(self.deck.draw())
+            card = self.deck.draw()
+            self.entities.append(card)
+            self.hand.add_card(card)
 
         ## Dragging
         # for entity in self.entities:
@@ -139,16 +143,17 @@ class Card(pygame.sprite.Sprite):
     """
     Basic card class this handles card game data.
     """
-    def __init__(self, suit: Suit, rank: Rank):
+    def __init__(self, suit: Suit, rank: Rank, pos=(100, 100)):
         pygame.sprite.Sprite.__init__(self)
 
         self.suit = suit
         self.rank = rank
 
         self.image = self.__construct_sprite()
+
         self.rect = pygame.Rect(
-            0,
-            0,
+            pos[0],
+            pos[1],
             self.image.get_width(),
             self.image.get_height())
 
@@ -178,6 +183,10 @@ class Deck(pygame.sprite.Sprite):
 
         self.__cards = []
 
+    @property
+    def length(self):
+        return len(self.__cards)
+
     def draw(self) -> Card:
         if len(self.__cards) > 0:
             return self.__cards.pop()
@@ -191,6 +200,40 @@ class Deck(pygame.sprite.Sprite):
 
     def shuffle(self):
         random.shuffle(self.__cards)
+
+
+class Hand:
+    def __init__(self):
+        global max_h
+        global max_w
+
+        self.__hand = []
+        self.__pos = (max_w // 2, max_h // 1.4)
+
+    @property
+    def hand(self):
+        return self.__hand
+
+    @property
+    def hand_size(self):
+        return len(self.__hand)
+
+    def add_card(self, card: Card):
+        self.__hand.append(card)
+        self.adjust_card_pos()
+
+    def adjust_card_pos(self):
+        h_size = self.hand_size
+        rel_positions = []
+
+        for i in range(1, h_size + 1):
+            rel_positions.append(i/2)
+            rel_positions = [p - 0.5 for p in rel_positions]
+
+        for i, c in enumerate(self.__hand):
+            c.rect.y = self.__pos[1]
+            c.rect.x = self.__pos[0] + rel_positions[i] * c.rect.width
+
 
 
 def _float_to_int8(f: float):
