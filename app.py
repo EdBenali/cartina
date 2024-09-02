@@ -22,6 +22,8 @@ global max_w
 global max_h
 global screen
 
+global clicked
+
 
 class App:
     def __init__(self):
@@ -56,10 +58,13 @@ class App:
 
 
         """
+        global clicked
+
         # fps = 144
         fps_clock = pygame.time.Clock()
 
         mouse_x, mouse_y = 0, 0
+
         clicked = False
 
         running = True
@@ -89,8 +94,7 @@ class App:
 
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
-                mouse_y=mouse_y,
-                clicked=clicked)
+                mouse_y=mouse_y)
 
             pygame.display.update()
             fps_clock.tick()
@@ -118,21 +122,22 @@ class App:
 
     def _handle_mouse_interaction(self,
                                   mouse_x: int,
-                                  mouse_y: int,
-                                  clicked: bool):
+                                  mouse_y: int):
         """
         Handles mouse interactions.
 
         :param mouse_x: int,
-        :param mouse_y: int,
-        :param clicked: bool
+        :param mouse_y: int
         """
+        global clicked
+
         # Deck Click
         if clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
             # Add card to hand
             card = self.deck.draw()
             self.entities.append(card)
             self.hand.add_card(card)
+            clicked = False
 
         ## Dragging
         # for entity in self.entities:
@@ -211,6 +216,7 @@ class Hand:
 
         self.__hand = []
         self.__pos = (max_w // 2, max_h // 1.4)
+        self.__rel_positions = []
 
     @property
     def hand(self):
@@ -225,17 +231,12 @@ class Hand:
         self.adjust_card_pos()
 
     def adjust_card_pos(self):
-        h_size = self.hand_size
-        rel_positions = []
-
-        for i in range(1, h_size + 1):
-            rel_positions.append(i/2)
-            rel_positions = [p - 0.5 for p in rel_positions]
+        self.__rel_positions.append(self.hand_size/2)
+        self.__rel_positions = [p - 0.5 for p in self.__rel_positions]
 
         for i, c in enumerate(self.__hand):
-            c.rect.y = self.__pos[1]
-            c.rect.x = self.__pos[0] + rel_positions[i] * c.rect.width
-
+            c.rect.center = (self.__pos[0] + self.__rel_positions[i] * c.rect.width, # ... + c.rect.width//2 for stacking cards in hand
+                             self.__pos[1])
 
 
 def _float_to_int8(f: float):
