@@ -49,6 +49,7 @@ class App:
         self.deck.shuffle()
 
         self.hand = Hand()
+        self.selected = None
 
         self.entities = []
 
@@ -139,6 +140,23 @@ class App:
             self.hand.add_card(card)
             clicked = False
 
+        if clicked:
+            for c in self.hand.hand:
+                if c.rect.collidepoint(mouse_x, mouse_y):
+                    # Realign old card
+                    if self.selected:
+                        self.selected.rect.y += 20
+
+                    # Select new card
+                    if c != self.selected:
+                        self.selected = c
+                        self.selected.rect.y -= 20
+
+                    # Drop selected card if reselected
+                    else:
+                        self.selected = None
+                    clicked = False
+
         ## Dragging
         # for entity in self.entities:
         #     if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
@@ -189,24 +207,27 @@ class Deck(pygame.sprite.Sprite):
             self.height)
 
         self.__cards = []
+        self.empty = True
 
     @property
     def length(self):
         return len(self.__cards)
 
     def draw(self) -> Card:
-        if len(self.__cards) > 0:
+        if len(self.__cards) == 0:
+            self.empty = True
+        if not self.empty:
             return self.__cards.pop()
-        else:
-            pass
 
     def add_standard_deck(self):
         for s in Suits:
             for r in Ranks:
                 self.__cards.append(Card(suit=s.value, rank=r.value))
+        self.empty = False
 
     def shuffle(self):
-        random.shuffle(self.__cards)
+        if not self.empty:
+            random.shuffle(self.__cards)
 
 
 class Hand:
