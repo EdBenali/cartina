@@ -1,11 +1,23 @@
 from enum import Enum
-from constants import RED, BLACK
+from constants import RED, BLACK, BLK_BLU, BLK_RED
 
 
 class Suit:
-    def __init__(self, value: str, colour: tuple):
-        self.value = value
+
+    def __init__(self, suit: str, colour: tuple):
+        self.suit = suit
         self.colour = colour
+        self.__calc_row_ref()
+
+    def __calc_row_ref(self):
+        if self.suit == 'Clubs':
+            self.row_ref = 0
+        elif self.suit == 'Hearts':
+            self.row_ref = 1
+        elif self.suit == 'Spades':
+            self.row_ref = 2
+        elif self.suit == 'Diamonds':
+            self.row_ref = 3
 
 
 class RankGroup(Enum):
@@ -15,29 +27,43 @@ class RankGroup(Enum):
 
 
 class Rank:
-    def __init__(self, symbol: str, group: RankGroup):
-        self.symbol = symbol
+    def __init__(self, rank: str, group: RankGroup):
+        self.rank = rank
         self.group = group
+        self.__calc_col_ref()
+
+    def __calc_col_ref(self):
+        if self.group == RankGroup.Number:
+            self.col_ref = int(self.rank) - 1
+        elif self.rank == 'A':
+            self.col_ref = 0
+        elif self.rank == 'J':
+            self.col_ref = 10
+        elif self.rank == 'Q':
+            self.col_ref = 11
+        elif self.rank == 'K':
+            self.col_ref = 12
+
 
 
 class Suits(Enum):
-    Clubs = Suit('Clubs', BLACK)
-    Diamonds = Suit('Diamonds', RED)
-    Hearts = Suit('Hearts', RED)
-    Spades = Suit('Spades', BLACK)
+    Clubs = Suit(suit='Clubs', colour=BLK_BLU)
+    Diamonds = Suit(suit='Diamonds', colour=BLK_RED)
+    Hearts = Suit(suit='Hearts', colour=BLK_RED)
+    Spades = Suit(suit='Spades', colour=BLK_BLU)
 
 
 class Ranks(Enum):
-    Ace = Rank(symbol='A', group=RankGroup.Ace)
-    Two = Rank(symbol='2', group=RankGroup.Number)
-    Three = Rank(symbol='3', group=RankGroup.Number)
-    Four = Rank(symbol='4', group=RankGroup.Number)
-    Five = Rank(symbol='5', group=RankGroup.Number)
-    Six = Rank(symbol='6', group=RankGroup.Number)
-    Seven = Rank(symbol='7', group=RankGroup.Number)
-    Eight = Rank(symbol='8', group=RankGroup.Number)
-    Nine = Rank(symbol='9', group=RankGroup.Number)
-    Ten = Rank(symbol='10', group=RankGroup.Number)
-    Jack = Rank(symbol='J', group=RankGroup.Face)
-    Queen = Rank(symbol='Q', group=RankGroup.Face)
-    King = Rank(symbol='K', group=RankGroup.Face)
+    Ace = Rank(rank='A', group=RankGroup.Ace)
+    Two = Rank(rank='2', group=RankGroup.Number)
+    Three = Rank(rank='3', group=RankGroup.Number)
+    Four = Rank(rank='4', group=RankGroup.Number)
+    Five = Rank(rank='5', group=RankGroup.Number)
+    Six = Rank(rank='6', group=RankGroup.Number)
+    Seven = Rank(rank='7', group=RankGroup.Number)
+    Eight = Rank(rank='8', group=RankGroup.Number)
+    Nine = Rank(rank='9', group=RankGroup.Number)
+    Ten = Rank(rank='10', group=RankGroup.Number)
+    Jack = Rank(rank='J', group=RankGroup.Face)
+    Queen = Rank(rank='Q', group=RankGroup.Face)
+    King = Rank(rank='K', group=RankGroup.Face)

@@ -17,20 +17,16 @@ TODO:
   - Tech debt:
       - Handle smaller resolutions/ ensure any resolution/window size works
 """
-
-global max_w
-global max_h
 global screen
 
 global clicked
+
+CARD_SPRITE_DIR = 'Cards Pixel Art - Pack (64x96)' # https://kaboff.itch.io/cards-pixel-art-pack-64x96
 
 
 class App:
     def __init__(self):
         pygame.init()
-
-        global max_w
-        global max_h
         global screen
 
         display_info = pygame.display.Info()
@@ -61,8 +57,8 @@ class App:
         """
         global clicked
 
-        # fps = 144
-        fps_clock = pygame.time.Clock()
+        fps_clock = pygame.time.Clock(# fps = 144
+            )
 
         mouse_x, mouse_y = 0, 0
 
@@ -120,6 +116,10 @@ class App:
             # Debugging tool
             if show_collision_boundaries:
                 pygame.draw.rect(screen, RED, entity.rect, 1)
+
+        # Debugging // Draw Centre
+        pygame.draw.circle(screen, RED, (screen.get_width()  // 2,
+                                         screen.get_height() // 2), 10)
 
     def _handle_mouse_interaction(self,
                                   mouse_x: int,
@@ -183,9 +183,16 @@ class Card(pygame.sprite.Sprite):
             self.image.get_height())
 
     def __construct_sprite(self):
-        return pygame.image.load(
-            f"assets/card_gen/{self.rank.symbol}_of"
-            f"_{self.suit.value}.png").convert()
+        col = self.rank.col_ref
+        row = self.suit.row_ref
+
+        img = pygame.image.load(
+            f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col*64}_"
+            f"{row*96}.png").convert()
+        img = pygame.transform.scale_by(img, 2)
+
+        return img
+
 
 
 class Deck(pygame.sprite.Sprite):
@@ -194,17 +201,23 @@ class Deck(pygame.sprite.Sprite):
 
         global screen
 
-        self.image = pygame.image.load(
-            f"assets/card_gen/card_back.png").convert()
+        image = pygame.image.load(
+            f"assets/{CARD_SPRITE_DIR}/black_white/192_384.png").convert()
+
+        self.image = pygame.transform.scale_by(image, 2)
 
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
         self.rect = pygame.Rect(
-            screen.get_width() // 2 - self.width // 2,
-            screen.get_height() // 2 - self.height // 2,
+            0,
+            0,
             self.width,
             self.height)
+
+        self.rect.center = (
+            screen.get_width() // 2,
+            screen.get_height() // 2)
 
         self.__cards = []
         self.empty = True
@@ -231,12 +244,11 @@ class Deck(pygame.sprite.Sprite):
 
 
 class Hand:
-    def __init__(self):
-        global max_h
-        global max_w
+    global screen
 
+    def __init__(self):
         self.__hand = []
-        self.__pos = (max_w // 2, max_h // 1.4)
+        self.__pos = (screen.get_width() // 2, screen.get_height() // 1.4)
         self.__rel_positions = []
 
     @property
