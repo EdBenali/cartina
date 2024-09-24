@@ -12,7 +12,8 @@ class Deck(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         image = pygame.image.load(
-            f"assets/{CARD_SPRITE_DIR}/black_white/192_384.png").convert()
+            f"assets/{CARD_SPRITE_DIR}/black_white/192_384.png"
+            ).convert_alpha()
 
         self.image = pygame.transform.scale_by(image, 2)
 

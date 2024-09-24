@@ -27,7 +27,7 @@ class Card(pygame.sprite.Sprite):
 
         img = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col*64}_"
-            f"{row*96}.png").convert()
+            f"{row*96}.png").convert_alpha()
         img = pygame.transform.scale_by(img, 2)
 
         self.image = img

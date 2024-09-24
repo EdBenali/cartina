@@ -68,7 +68,18 @@ class KingsCorner:
                     self.hand.remove_card(selected)
 
                     selected.update_rotation(tile.angle)
-                    selected.update_position(tile.rect.center)
+
+                    number_of_cards = len(tile.cards) - 1
+                    pos = tile.rect.center
+                    selected.update_position(
+                        (
+                            pos[0] + (tile.position[0] * tile.card_size // 3 *
+                                  number_of_cards),
+                            pos[1] + (tile.position[1] * tile.card_size // 3 *
+                                  number_of_cards)
+                        )
+                    )
+
 
                     selected = None
                     clicked = False

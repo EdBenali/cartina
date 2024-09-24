@@ -32,6 +32,5 @@ class Hand:
     def adjust_card_pos(self):
         for i, c in enumerate(self.__cards):
             c.update_position((self.__pos[0] + self.__rel_positions[i] *
-                                  c.rect.width,
-                   # ... + c.rect.width//2 for stacking cards in hand
+                                  c.rect.width, #//2
                              self.__pos[1]))

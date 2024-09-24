@@ -1,4 +1,4 @@
-from constants import BLACK, RED, TITLE
+from constants import BLACK, RED, TITLE, WHITE
 
 import pygame
 from pygame.locals import *
@@ -96,7 +96,7 @@ class App:
 
         pygame.quit()
 
-    def _draw_scene(self, show_collision_boundaries=True):
+    def _draw_scene(self, show_collision_boundaries=False):
         """
         Handles updating the screen and redrawing all scene elements.
         """
@@ -140,7 +140,8 @@ class App:
                 if c.rect.collidepoint(mouse_x, mouse_y):
                     # Realign old card
                     if self.selected:
-                        self.selected.rect.y += 20
+                        pos = self.selected.rect.center
+                        self.selected.update_position((pos[0], pos[1] + 20))
 
                     # Select new card
                     if c != self.selected:
@@ -151,8 +152,10 @@ class App:
 
                         # Set new card selected
                         self.selected = c
+
                         # Pop up new card
-                        self.selected.rect.y -= 20
+                        pos = self.selected.rect.center
+                        self.selected.update_position((pos[0], pos[1] - 20))
 
                     # Drop selected card if reselected
                     else:
