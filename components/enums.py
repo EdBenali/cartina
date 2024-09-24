@@ -1,5 +1,6 @@
 from enum import Enum
-from constants import RED, BLACK, BLK_BLU, BLK_RED
+
+from constants import BLACK_CARD_THEME, RED_CARD_THEME
 
 
 class Suit:
@@ -47,10 +48,10 @@ class Rank:
 
 
 class Suits(Enum):
-    Clubs = Suit(suit='Clubs', colour=BLK_BLU)
-    Diamonds = Suit(suit='Diamonds', colour=BLK_RED)
-    Hearts = Suit(suit='Hearts', colour=BLK_RED)
-    Spades = Suit(suit='Spades', colour=BLK_BLU)
+    Clubs = Suit(suit='Clubs', colour=BLACK_CARD_THEME)
+    Diamonds = Suit(suit='Diamonds', colour=RED_CARD_THEME)
+    Hearts = Suit(suit='Hearts', colour=RED_CARD_THEME)
+    Spades = Suit(suit='Spades', colour=BLACK_CARD_THEME)
 
 
 class Ranks(Enum):

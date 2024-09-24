@@ -23,6 +23,10 @@ class Tile(pygame.sprite.Sprite):
 
         self.cards = []
 
+    @property
+    def length(self):
+        return len(self.cards)
+
 
 class CardinalPosition(Enum):
     NORTH = {'angle' : 0,
