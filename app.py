@@ -30,10 +30,8 @@ class App:
         global screen
 
         display_info = pygame.display.Info()
-        max_w = display_info.current_w
-        max_h = display_info.current_h
         screen = pygame.display.set_mode(
-            [max_w, max_h],
+            [display_info.current_w, display_info.current_h],
             pygame.RESIZABLE
         )
         pygame.display.set_caption('Cartina')
