@@ -67,9 +67,15 @@ class KingsCorner:
             self.entities.append(card)
             self.hand.add_card(card)
 
+        # Initialise normal tiles
+        for tile in self.norm_tiles:
+            card = self.deck.draw()
+            self.entities.append(card)
+            tile.add_card(card)
+
     def main_loop(self, mouse_x: int, mouse_y: int, clicked: bool,
                   selected: Card) -> (bool, Card):
-        # Check for tile interaction
+        # Check card from hand to tile interaction
         if clicked and selected:
             for tile in self.tiles:
                 if tile.rect.collidepoint(mouse_x, mouse_y):
@@ -77,7 +83,9 @@ class KingsCorner:
                         tile,
                         selected,
                         clicked)
+        # TODO add card from tile to til interaction
 
+        # TODO add end on hand empty
         return clicked, selected
 
     def __handle_tiles(self, tile: Tile, selected: Card, clicked: bool):
@@ -99,21 +107,10 @@ class KingsCorner:
                 return clicked, selected
 
     def __add_card_to_tile(self, selected, tile):
-        tile.cards.append(selected)
+        tile.add_card(selected)
         self.hand.remove_card(selected)
 
-        selected.update_rotation(tile.angle)
-        number_of_cards = tile.length - 1
-        pos = tile.rect.center
 
-        selected.update_position(
-            (
-                pos[0] + (tile.position[0] * tile.card_size // 3 *
-                          number_of_cards),
-                pos[1] + (tile.position[1] * tile.card_size // 3 *
-                          number_of_cards)
-            )
-        )
         return False, None
 
     @staticmethod

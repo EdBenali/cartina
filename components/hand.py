@@ -29,6 +29,8 @@ class Hand:
         self.__rel_positions = [p + 0.5 for p in self.__rel_positions]
         self.adjust_card_pos()
 
+    # TODO I think the logic here is the source of the card height bug on
+    #  select and draw
     def adjust_card_pos(self):
         for i, c in enumerate(self.__cards):
             c.update_position((self.__pos[0] + self.__rel_positions[i] *

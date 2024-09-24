@@ -27,6 +27,21 @@ class Tile(pygame.sprite.Sprite):
     def length(self):
         return len(self.cards)
 
+    def add_card(self, card):
+        self.cards.append(card)
+        card.update_rotation(self.angle)
+        number_of_cards = self.length - 1
+        pos = self.rect.center
+
+        card.update_position(
+            (
+                pos[0] + (self.position[0] * self.card_size // 3 *
+                          number_of_cards),
+                pos[1] + (self.position[1] * self.card_size // 3 *
+                          number_of_cards)
+            )
+        )
+
 
 class CardinalPosition(Enum):
     NORTH = {'angle' : 0,
