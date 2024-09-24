@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 
-from enums import Rank, Suit, Suits, Ranks, RankGroup
+from components.enums import Rank, Suit, Suits, Ranks, RankGroup
 from scripts.card_utils import CARD_WIDTH, CARD_HEIGHT, create_blank_card
 
 SYMBOL_SIZE = CARD_WIDTH // 2

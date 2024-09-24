@@ -11,3 +11,5 @@ BLK_WHT = 'black_white'
 WHT_RED = 'white_red'
 WHT_BLU = 'white_blue'
 WHT_BLK = 'white_black'
+
+CARD_SPRITE_DIR = 'Cards Pixel Art - Pack (64x96)' # https://kaboff.itch.io/cards-pixel-art-pack-64x96
