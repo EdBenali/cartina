@@ -7,8 +7,6 @@ from games.kings_corner.main import KingsCorner
 
 """
 TODO:
-  - Add set screen regions, eg hand, play area, deck
-      - Figure out how to centre the card objects
   - Add game logic, win states, rounds, card dealing
       - Add bots for solo play?
   - Clean up styling, better card sprites, better background, Balatro-esq?
@@ -40,6 +38,7 @@ class App:
         self.deck = self.game.deck
 
         self.hand = self.game.hand
+        self.active_cards = self.game.active_cards
         self.entities = self.game.entities
 
         self.clicked = False
@@ -77,17 +76,18 @@ class App:
                     if event.key == K_d:
                         card = self.deck.draw()
                         self.entities.append(card)
+                        self.active_cards.append(card)
                         self.hand.add_card(card)
-
-            self._handle_mouse_interaction(
-                mouse_x=mouse_x,
-                mouse_y=mouse_y)
 
             self.clicked, self.selected = self.game.main_loop(
                 mouse_x=mouse_x,
                 mouse_y=mouse_y,
                 clicked=self.clicked,
                 selected=self.selected)
+
+            self._handle_mouse_interaction(
+                mouse_x=mouse_x,
+                mouse_y=mouse_y)
 
             pygame.display.update()
             fps_clock.tick()
@@ -132,19 +132,15 @@ class App:
             card = self.deck.draw()
             self.entities.append(card)
             self.hand.add_card(card)
+            self.active_cards.append(card)
             self.clicked = False
 
         # Select card
         if self.clicked:
-            for c in self.hand.cards:
+            for c in self.active_cards:
                 if c.rect.collidepoint(mouse_x, mouse_y):
-                    # Realign old card
-                    if self.selected:
-                        pos = self.selected.rect.center
-                        self.selected.update_position((pos[0], pos[1] + 20))
-
                     # Select new card
-                    if c != self.selected:
+                    if not self.selected:
                         # Bring new card to top
                         for i, entity in enumerate(self.entities):
                             if entity == c:
@@ -156,14 +152,14 @@ class App:
                         # Pop up new card
                         pos = self.selected.rect.center
                         self.selected.update_position((pos[0], pos[1] - 20))
-
-                    # Drop selected card if reselected
-                    else:
+                    # Deselect card
+                    elif c == self.selected:
+                        pos = self.selected.rect.center
+                        self.selected.update_position((pos[0], pos[1] + 20))
                         self.selected = None
                     self.clicked = False
 
-        ## Dragging
+        # # Dragging
         # for entity in self.entities:
-        #     if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
-        #         entity.rect.x = mouse_x - (entity.rect.width / 2)
-        #         entity.rect.y = mouse_y - (entity.rect.height / 2)
+        #     if self.clicked and entity.rect.collidepoint(mouse_x, mouse_y):
+        #         entity.rect.center = (mouse_x, mouse_y)

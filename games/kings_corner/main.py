@@ -4,8 +4,7 @@ from components.enums import Ranks
 from components.hand import Hand
 from components.tile import Tile, CardinalPosition
 
-REDS = ('Diamonds', 'Hearts')
-BLACKS = ('Spades', 'Clubs')
+
 RANK_ORDER = (Ranks.King.value, Ranks.Queen.value, Ranks.Jack.value,
               Ranks.Ten.value, Ranks.Nine.value, Ranks.Eight.value,
               Ranks.Seven.value, Ranks.Six.value, Ranks.Five.value,
@@ -26,6 +25,7 @@ class KingsCorner:
         card_size = self.deck.rect.height
 
         self.hand = Hand(screen)
+        self.active_cards = []
 
         self.entities = [self.deck]
 
@@ -64,6 +64,7 @@ class KingsCorner:
         # Initialise starting hand
         for i in range(7):
             card = self.deck.draw()
+            self.active_cards.append(card)
             self.entities.append(card)
             self.hand.add_card(card)
 
@@ -71,7 +72,8 @@ class KingsCorner:
         for tile in self.norm_tiles:
             card = self.deck.draw()
             self.entities.append(card)
-            tile.add_card(card)
+            self.active_cards.append(card)
+            tile.add_cards([card])
 
     def main_loop(self, mouse_x: int, mouse_y: int, clicked: bool,
                   selected: Card) -> (bool, Card):
@@ -79,38 +81,55 @@ class KingsCorner:
         if clicked and selected:
             for tile in self.tiles:
                 if tile.rect.collidepoint(mouse_x, mouse_y):
-                    clicked, selected = self.__handle_tiles(
+                    clicked, selected = self.__handle_hand_to_tiles(
                         tile,
                         selected,
                         clicked)
-        # TODO add card from tile to til interaction
+        # TODO add card from tile to tile interaction
 
         # TODO add end on hand empty
+
         return clicked, selected
 
-    def __handle_tiles(self, tile: Tile, selected: Card, clicked: bool):
+    def __handle_hand_to_tiles(self, tile: Tile, selected: Card, clicked: bool):
         if tile in self.corner_tiles:
             if ((selected.rank == Ranks.King.value and tile.length == 0) or
                 tile.length> 0 and self.__valid_card_stack(selected,
                                                     prior=tile.cards[-1])):
-                return self.__add_card_to_tile(selected, tile)
+                if selected in self.hand.cards:
+                    return self.__move_card_hand_to_tile(selected, tile)
+                else:
+                    return self.__move_card_tile_to_tile(selected, tile)
             else:
-                print("Invalid move")
+                # TODO Communicate this to the player
+                print("Invalid move on corner tile")
                 return clicked, selected
 
         elif tile in self.norm_tiles:
             if ((tile.length == 0) or
                 self.__valid_card_stack(selected, prior=tile.cards[-1])):
-                return self.__add_card_to_tile(selected, tile)
+                if selected in self.hand.cards:
+                    return self.__move_card_hand_to_tile(selected, tile)
+                else:
+                    return self.__move_card_tile_to_tile(selected, tile)
             else:
-                print("Invalid move")
+                # TODO Same as above
+                print("Invalid move on normal tile")
                 return clicked, selected
 
-    def __add_card_to_tile(self, selected, tile):
-        tile.add_card(selected)
+    def __move_card_hand_to_tile(self, selected: Card, tile: Tile) -> (bool, Card):
+        tile.add_cards([selected])
         self.hand.remove_card(selected)
 
+        return False, None
 
+
+    def __move_card_tile_to_tile(self, selected: Card, tile: Tile) -> (bool, Card):
+        for tile in self.tiles:
+            if selected in tile.cards:
+                cards = tile.remove_cards(selected)
+                break
+        tile.add_cards(cards)
         return False, None
 
     @staticmethod
