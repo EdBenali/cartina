@@ -85,7 +85,6 @@ class KingsCorner:
                         tile,
                         selected,
                         clicked)
-        # TODO add card from tile to tile interaction
 
         # TODO add end on hand empty
 
@@ -135,7 +134,8 @@ class KingsCorner:
     @staticmethod
     def __valid_card_stack(selected: Card, prior: Card) -> bool:
         if (selected.suit.colour != prior.suit.colour) and (
-            selected.rank == RANK_ORDER[RANK_ORDER.index(prior.rank) + 1]):
+            selected.rank == RANK_ORDER[max(RANK_ORDER.index(prior.rank) +
+                                            1, 12)]):
             return True
 
         return False

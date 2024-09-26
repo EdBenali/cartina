@@ -64,6 +64,8 @@ class App:
                 if event.type == pygame.QUIT:
                     running = False
 
+                # TODO add resize entity realignment
+
                 if event.type == MOUSEMOTION:
                     mouse_x, mouse_y = event.pos
 
