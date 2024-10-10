@@ -1,35 +1,48 @@
-from constants import BLACK, RED, TITLE
-from enums import Suit, Rank, Ranks, Suits
+from constants import BLACK, RED, TITLE, WHITE
+
 import pygame
 from pygame.locals import *
 
-# TODO:
-#   - Add set screen regions, eg hand, play area, deck
-#   - Add game logic, win states, rounds, card dealing
-#       - Add bots for solo play?
-#   - Clean up styling, better card sprites, better background, Balatro-esq?
-#   - Add multiplayer? Online/Local
-#   - Export to other languages for distribution
-#   - Tech debt:
-#       - Handle smaller resolutions
+from games.kings_corner.main import KingsCorner
+
+"""
+TODO:
+  - Add game logic, win states, rounds, card dealing
+      - Add bots for solo play?
+  - Clean up styling, better card sprites, better background, Balatro-esq?
+      - Shader for bg (side quest)
+  - Add multiplayer? Online/Local(bots/ai)
+  - Export to other languages for distribution
+  - Tech debt:
+      - Handle smaller resolutions/ ensure any resolution/window size works
+"""
+global screen
 
 
 class App:
     def __init__(self):
         pygame.init()
+        global screen
 
         display_info = pygame.display.Info()
-        self.max_w = display_info.current_w
-        self.max_h = display_info.current_h
-        self.screen = pygame.display.set_mode(
-            [self.max_w, self.max_h],
+        screen = pygame.display.set_mode(
+            [display_info.current_w, display_info.current_h],
             pygame.RESIZABLE
         )
         pygame.display.set_caption('Cartina')
 
         self.bg = BLACK
 
-        self.entities = []
+        self.game = KingsCorner(screen)
+
+        self.deck = self.game.deck
+
+        self.hand = self.game.hand
+        self.active_cards = self.game.active_cards
+        self.entities = self.game.entities
+
+        self.clicked = False
+        self.selected = None
 
     def main_loop(self):
         """
@@ -37,15 +50,12 @@ class App:
 
 
         """
-        # fps = 144
-        fps_clock = pygame.time.Clock()
+        fps_clock = pygame.time.Clock(# fps = 144
+            )
 
         mouse_x, mouse_y = 0, 0
-        clicked = False
 
         running = True
-
-        self.entities.append(Card(Suits.Spades.value, Ranks.Ace.value))
 
         while running:
             self._draw_scene()
@@ -54,23 +64,32 @@ class App:
                 if event.type == pygame.QUIT:
                     running = False
 
+                # TODO add resize entity realignment
+
                 if event.type == MOUSEMOTION:
                     mouse_x, mouse_y = event.pos
 
                 if event.type == MOUSEBUTTONDOWN:
-                    clicked = True
+                    self.clicked = True
                 elif event.type == MOUSEBUTTONUP:
-                    clicked = False
+                    self.clicked = False
 
                 if event.type == KEYDOWN:
-                    if event.key == K_w:
-                        self.entities.append(Card(Suits.Hearts.value,
-                                                  Ranks.Seven.value))
+                    if event.key == K_d:
+                        card = self.deck.draw()
+                        self.entities.append(card)
+                        self.active_cards.append(card)
+                        self.hand.add_card(card)
+
+            self.clicked, self.selected = self.game.main_loop(
+                mouse_x=mouse_x,
+                mouse_y=mouse_y,
+                clicked=self.clicked,
+                selected=self.selected)
 
             self._handle_mouse_interaction(
                 mouse_x=mouse_x,
-                mouse_y=mouse_y,
-                clicked=clicked)
+                mouse_y=mouse_y)
 
             pygame.display.update()
             fps_clock.tick()
@@ -83,56 +102,66 @@ class App:
         """
         Handles updating the screen and redrawing all scene elements.
         """
+        global screen
+
         # Draw background
-        self.screen.fill(self.bg)
+        screen.fill(self.bg)
 
         # Draw Entities
         for entity in self.entities:
-            self.screen.blit(entity.image, (entity.rect.x, entity.rect.y))
+            screen.blit(entity.image, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
             if show_collision_boundaries:
-                pygame.draw.rect(self.screen, RED, entity.rect, 1)
+                pygame.draw.rect(screen, RED, entity.rect, 1)
+
+        # Debugging // Draw Centre
+        pygame.draw.circle(screen, RED, (screen.get_width()  // 2,
+                                         screen.get_height() // 2), 10)
 
     def _handle_mouse_interaction(self,
                                   mouse_x: int,
-                                  mouse_y: int,
-                                  clicked: bool):
+                                  mouse_y: int):
         """
         Handles mouse interactions.
 
         :param mouse_x: int,
-        :param mouse_y: int,
-        :param clicked: bool
+        :param mouse_y: int
         """
-        for entity in self.entities:
-            if clicked and entity.rect.collidepoint(mouse_x, mouse_y):
-                entity.rect.x = mouse_x - (entity.rect.width / 2)
-                entity.rect.y = mouse_y - (entity.rect.height / 2)
+        # Deck Click
+        if self.clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
+            # Add card to hand
+            card = self.deck.draw()
+            self.entities.append(card)
+            self.hand.add_card(card)
+            self.active_cards.append(card)
+            self.clicked = False
 
+        # Select card
+        if self.clicked:
+            for c in self.active_cards:
+                if c.rect.collidepoint(mouse_x, mouse_y):
+                    # Select new card
+                    if not self.selected:
+                        # Bring new card to top
+                        for i, entity in enumerate(self.entities):
+                            if entity == c:
+                                self.entities.append(self.entities.pop(i))
 
-class Card(pygame.sprite.Sprite):
-    """
-    Basic card class this handles card game data.
-    """
-    def __init__(self, suit: Suit, rank: Rank):
-        pygame.sprite.Sprite.__init__(self)
+                        # Set new card selected
+                        self.selected = c
 
-        self.suit = suit
-        self.rank = rank
+                        # Pop up new card
+                        pos = self.selected.rect.center
+                        self.selected.update_position((pos[0], pos[1] - 20))
+                    # Deselect card
+                    elif c == self.selected:
+                        pos = self.selected.rect.center
+                        self.selected.update_position((pos[0], pos[1] + 20))
+                        self.selected = None
+                    self.clicked = False
 
-        self.image = self.__construct_sprite()
-        self.rect = pygame.Rect(
-            0,
-            0,
-            self.image.get_width(),
-            self.image.get_height())
-
-    def __construct_sprite(self):
-        return pygame.image.load(
-            f"assets/card_gen/{self.rank.symbol}_of"
-            f"_{self.suit.value}.png").convert()
-
-
-def _float_to_int8(f: float):
-    return int(round(f * 255, 1))
+        # # Dragging
+        # for entity in self.entities:
+        #     if self.clicked and entity.rect.collidepoint(mouse_x, mouse_y):
+        #         entity.rect.center = (mouse_x, mouse_y)
