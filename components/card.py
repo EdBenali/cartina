@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import pygame
 
 from components.enums import Suit, Rank
@@ -8,7 +10,7 @@ class Card(pygame.sprite.Sprite):
     """
     Basic card class this handles card game data.
     """
-    def __init__(self, suit: Suit, rank: Rank, pos=(0, 0)):
+    def __init__(self, suit: Suit, rank: Rank, pos:Tuple=(0, 0)):
         pygame.sprite.Sprite.__init__(self)
 
         self.suit = suit
