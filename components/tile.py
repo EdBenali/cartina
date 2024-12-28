@@ -4,6 +4,7 @@ from typing import List
 import pygame
 
 from components.card import Card
+from components.enums import GUI_SCALE
 from constants import CARD_SPRITE_DIR
 
 class Tile(pygame.sprite.Sprite):
@@ -15,7 +16,7 @@ class Tile(pygame.sprite.Sprite):
 
         self.image = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/black_white/0_384.png").convert_alpha()
-        self.image = pygame.transform.scale_by(self.image, 2)
+        self.image = pygame.transform.scale_by(self.image, GUI_SCALE)
 
         self.image = pygame.transform.rotate(self.image, self.angle)
 

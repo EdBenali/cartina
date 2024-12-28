@@ -1,9 +1,13 @@
+import logging
+from copy import copy
+
+import pygame
+
 from components.card import Card
 from components.deck import Deck
 from components.enums import Ranks
 from components.hand import Hand
 from components.tile import Tile, CardinalPosition
-
 
 RANK_ORDER = (Ranks.King.value, Ranks.Queen.value, Ranks.Jack.value,
               Ranks.Ten.value, Ranks.Nine.value, Ranks.Eight.value,
@@ -13,8 +17,9 @@ RANK_ORDER = (Ranks.King.value, Ranks.Queen.value, Ranks.Jack.value,
 
 
 class KingsCorner:
-    def __init__(self, screen):
+    def __init__(self, screen: pygame.surface):
         self.screen = screen
+
 
         self.deck = Deck(screen=screen,
                          pos=(screen.get_width() // 2,
@@ -101,7 +106,7 @@ class KingsCorner:
                     return self.__move_card_tile_to_tile(selected, tile)
             else:
                 # TODO Communicate this to the player
-                print("Invalid move on corner tile")
+                print("INVALID MOVE\nCORNER TILE")
                 return clicked, selected
 
         elif tile in self.norm_tiles:
@@ -113,7 +118,7 @@ class KingsCorner:
                     return self.__move_card_tile_to_tile(selected, tile)
             else:
                 # TODO Same as above
-                print("Invalid move on normal tile")
+                print("INVALID MOVE:\nNORMAL TILE")
                 return clicked, selected
 
     def __move_card_hand_to_tile(self, selected: Card, tile: Tile) -> (bool, Card):
@@ -126,6 +131,7 @@ class KingsCorner:
     def __move_card_tile_to_tile(self, selected: Card, tile: Tile) -> (bool, Card):
         for tile in self.tiles:
             if selected in tile.cards:
+                # TODO fix orientation
                 cards = tile.remove_cards(selected)
                 break
         tile.add_cards(cards)

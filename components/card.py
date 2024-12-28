@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pygame
 
-from components.enums import Suit, Rank
+from components.enums import Suit, Rank, GUI_SCALE
 from constants import CARD_SPRITE_DIR
 
 
@@ -30,7 +30,7 @@ class Card(pygame.sprite.Sprite):
         img = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col*64}_"
             f"{row*96}.png").convert_alpha()
-        img = pygame.transform.scale_by(img, 2)
+        img = pygame.transform.scale_by(img, GUI_SCALE)
 
         self.image = img
         self.rect = self.image.get_rect()
