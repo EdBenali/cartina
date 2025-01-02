@@ -47,9 +47,11 @@ class Tile(pygame.sprite.Sprite):
                 )
             )
 
-    def remove_cards(self, selected: Card) -> List[Card]:
+    def remove_card(self, selected: Card) -> List[Card]:
         for i, card in enumerate(self.cards):
             if card == selected:
+                card.update_rotation(-self.angle)
+
                 cards = self.cards[i:]
                 self.cards = self.cards[:i]
                 break

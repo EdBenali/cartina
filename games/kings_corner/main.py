@@ -129,10 +129,11 @@ class KingsCorner:
 
 
     def __move_card_tile_to_tile(self, selected: Card, tile: Tile) -> (bool, Card):
+        cards = None
         for tile in self.tiles:
             if selected in tile.cards:
                 # TODO fix orientation
-                cards = tile.remove_cards(selected)
+                cards = tile.remove_card(selected)
                 break
         tile.add_cards(cards)
         return False, None
