@@ -18,26 +18,32 @@ class Card(pygame.sprite.Sprite):
 
         self.rect = None
         self.image = None
-        self.__init_sprite()
+
+        self.image = self.load_image(self.rank.col_ref, self.suit.row_ref)
+
+        self.rect = self.image.get_rect()
+
         self.update_position(pos)
 
-
-
-    def __init_sprite(self):
-        col = self.rank.col_ref
-        row = self.suit.row_ref
-
+    def load_image(self, col_ref, row_ref):
         img = pygame.image.load(
-            f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col*64}_"
-            f"{row*96}.png").convert_alpha()
+            f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col_ref * 64}_"
+            f"{row_ref * 96}.png").convert_alpha()
         img = pygame.transform.scale_by(img, GUI_SCALE)
-
-        self.image = img
-        self.rect = self.image.get_rect()
+        return img
 
     def update_position(self, pos):
          self.rect.center = pos
 
-    def update_rotation(self, angle):
+    def update_rotation(self, angle: int):
+        """
+        Rotates the sprite to the given angle.
+
+        :param angle: int between 0 and 360
+        """
+
+        # TODO after a few rotations the image gets blurry, might have to reload
+        # the image after a certain number of rotations
+        self.image = self.load_image(self.rank.col_ref, self.suit.row_ref)
         self.image = pygame.transform.rotate(self.image, angle)
         self.rect = self.image.get_rect()

@@ -103,11 +103,13 @@ class App:
         global screen
 
         # Draw background
+        # TODO: add background shader CRT-1 + others
         screen.fill(self.bg)
 
 
         # Draw Entities
         for entity in self.entities:
+            # TODO: need to add z-index to prevent bad overlap CRT-2
             screen.blit(entity.image, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
