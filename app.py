@@ -24,11 +24,9 @@ class App:
         pygame.init()
         global screen
 
-        display_info = pygame.display.Info()
+        # display_info = pygame.display.Info()
         screen = pygame.display.set_mode(
-            [display_info.current_w, display_info.current_h],
-            pygame.RESIZABLE
-        )
+            [1920, 1080])
         pygame.display.set_caption('Cartina')
 
         self.bg = BLACK
@@ -87,7 +85,7 @@ class App:
                 clicked=self.clicked,
                 selected=self.selected)
 
-            self._handle_mouse_interaction(
+            self._mouse_interaction(
                 mouse_x=mouse_x,
                 mouse_y=mouse_y)
 
@@ -98,28 +96,32 @@ class App:
 
         pygame.quit()
 
-    def _draw_scene(self, show_collision_boundaries=False):
+    def _draw_scene(self, debugging=False):
         """
         Handles updating the screen and redrawing all scene elements.
         """
         global screen
 
         # Draw background
+        # TODO: add background shader CRT-1 + others
         screen.fill(self.bg)
+
 
         # Draw Entities
         for entity in self.entities:
+            # TODO: need to add z-index to prevent bad overlap CRT-2
             screen.blit(entity.image, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
-            if show_collision_boundaries:
+            if debugging:
                 pygame.draw.rect(screen, RED, entity.rect, 1)
 
-        # Debugging // Draw Centre
-        pygame.draw.circle(screen, RED, (screen.get_width()  // 2,
+        if  debugging:
+            # Debugging // Draw Centre
+            pygame.draw.circle(screen, RED, (screen.get_width()  // 2,
                                          screen.get_height() // 2), 10)
 
-    def _handle_mouse_interaction(self,
+    def _mouse_interaction(self,
                                   mouse_x: int,
                                   mouse_y: int):
         """
@@ -128,15 +130,16 @@ class App:
         :param mouse_x: int,
         :param mouse_y: int
         """
-        # Deck Click
-        if self.clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
-            # Add card to hand
-            card = self.deck.draw()
-            self.entities.append(card)
-            self.hand.add_card(card)
-            self.active_cards.append(card)
-            self.clicked = False
+        self._deck_click(mouse_x, mouse_y)
 
+        self._card_click(mouse_x, mouse_y)
+
+        # # Dragging
+        # for entity in self.entities:
+        #     if self.clicked and entity.rect.collidepoint(mouse_x, mouse_y):
+        #         entity.rect.center = (mouse_x, mouse_y)
+
+    def _card_click(self, mouse_x, mouse_y):
         # Select card
         if self.clicked:
             for c in self.active_cards:
@@ -161,7 +164,12 @@ class App:
                         self.selected = None
                     self.clicked = False
 
-        # # Dragging
-        # for entity in self.entities:
-        #     if self.clicked and entity.rect.collidepoint(mouse_x, mouse_y):
-        #         entity.rect.center = (mouse_x, mouse_y)
+    def _deck_click(self, mouse_x, mouse_y):
+        # Deck Click
+        if self.clicked and self.deck.rect.collidepoint(mouse_x, mouse_y):
+            # Add card to hand
+            card = self.deck.draw()
+            self.entities.append(card)
+            self.hand.add_card(card)
+            self.active_cards.append(card)
+            self.clicked = False

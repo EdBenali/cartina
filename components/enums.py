@@ -2,6 +2,7 @@ from enum import Enum
 
 from constants import BLACK_CARD_THEME, RED_CARD_THEME
 
+GUI_SCALE = 1.2
 
 class Suit:
 

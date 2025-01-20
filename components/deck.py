@@ -3,7 +3,7 @@ import random
 import pygame
 
 from components.card import Card
-from components.enums import Suits, Ranks
+from components.enums import Suits, Ranks, GUI_SCALE
 from constants import CARD_SPRITE_DIR
 
 
@@ -15,7 +15,7 @@ class Deck(pygame.sprite.Sprite):
             f"assets/{CARD_SPRITE_DIR}/black_white/192_384.png"
             ).convert_alpha()
 
-        self.image = pygame.transform.scale_by(image, 2)
+        self.image = pygame.transform.scale_by(image, GUI_SCALE)
 
         self.width = self.image.get_width()
         self.height = self.image.get_height()
