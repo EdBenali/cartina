@@ -1,6 +1,3 @@
-import logging
-from copy import copy
-
 import pygame
 
 from components.card import Card
@@ -86,7 +83,7 @@ class KingsCorner:
 
 
         if self.hand.hand_size == 0:
-            # TODO End game
+            # TODO End game CRT-4
             pass
 
         return clicked, selected
@@ -116,7 +113,7 @@ class KingsCorner:
                 else:
                     return self.__move_card_tile_to_tile(selected, tile)
             else:
-                # TODO Communicate this to the player
+                # TODO Communicate this to the player CRT-3
                 print("INVALID MOVE\nCORNER TILE")
                 return clicked, selected
 
@@ -128,7 +125,7 @@ class KingsCorner:
                 else:
                     return self.__move_card_tile_to_tile(selected, tile)
             else:
-                # TODO Same as above
+                # TODO Same as above CRT-3
                 print("INVALID MOVE:\nNORMAL TILE")
                 return clicked, selected
 
@@ -157,7 +154,6 @@ class KingsCorner:
             if selected in tile.cards:
                 cards = tile.remove_card(selected)
                 break
-        # TODO need to fix the card draw position when moving a stack of cards
         end_tile.add_cards(cards)
         return False, None
 

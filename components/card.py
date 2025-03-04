@@ -16,21 +16,18 @@ class Card(pygame.sprite.Sprite):
         self.suit = suit
         self.rank = rank
 
-        self.rect = None
-        self.image = None
+        self.surface = self.load_image(self.rank.col_ref, self.suit.row_ref)
 
-        self.image = self.load_image(self.rank.col_ref, self.suit.row_ref)
-
-        self.rect = self.image.get_rect()
+        self.rect = self.surface.get_rect()
 
         self.update_position(pos)
 
     def load_image(self, col_ref, row_ref):
-        img = pygame.image.load(
+        surf = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/{self.suit.colour}/{col_ref * 64}_"
             f"{row_ref * 96}.png").convert_alpha()
-        img = pygame.transform.scale_by(img, GUI_SCALE)
-        return img
+        surf = pygame.transform.scale_by(surf, GUI_SCALE)
+        return surf
 
     def update_position(self, pos):
          self.rect.center = pos
@@ -41,9 +38,6 @@ class Card(pygame.sprite.Sprite):
 
         :param angle: int between 0 and 360
         """
-
-        # TODO after a few rotations the image gets blurry, might have to reload
-        # the image after a certain number of rotations
-        self.image = self.load_image(self.rank.col_ref, self.suit.row_ref)
-        self.image = pygame.transform.rotate(self.image, angle)
-        self.rect = self.image.get_rect()
+        self.surface = self.load_image(self.rank.col_ref, self.suit.row_ref)
+        self.surface = pygame.transform.rotate(self.surface, angle)
+        self.rect = self.surface.get_rect()
