@@ -11,14 +11,14 @@ class Deck(pygame.sprite.Sprite):
     def __init__(self, screen, pos):
         pygame.sprite.Sprite.__init__(self)
 
-        image = pygame.image.load(
+        surface = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/black_white/192_384.png"
             ).convert_alpha()
 
-        self.image = pygame.transform.scale_by(image, GUI_SCALE)
+        self.surface = pygame.transform.scale_by(surface, GUI_SCALE)
 
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
+        self.width = self.surface.get_width()
+        self.height = self.surface.get_height()
 
         self.rect = pygame.Rect(
             0,

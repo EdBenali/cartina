@@ -14,13 +14,13 @@ class Tile(pygame.sprite.Sprite):
         self.offset = cardinal.value['offset']
         self.card_size = card_size
 
-        self.image = pygame.image.load(
+        self.surface = pygame.image.load(
             f"assets/{CARD_SPRITE_DIR}/black_white/0_384.png").convert_alpha()
-        self.image = pygame.transform.scale_by(self.image, GUI_SCALE)
+        self.surface = pygame.transform.scale_by(self.surface, GUI_SCALE)
 
-        self.image = pygame.transform.rotate(self.image, self.angle)
+        self.surface = pygame.transform.rotate(self.surface, self.angle)
 
-        self.rect = self.image.get_rect()
+        self.rect = self.surface.get_rect()
         self.rect.center = (pos[0] + self.offset[0] * card_size * 1.5,
                             pos[1] + self.offset[1] * card_size * 1.5)
 
@@ -31,8 +31,8 @@ class Tile(pygame.sprite.Sprite):
         return len(self.cards)
 
     def add_cards(self, cards):
+        number_of_cards = self.length
         self.cards.extend(cards)
-        number_of_cards = self.length - 1
         pos = self.rect.center
 
         for card in cards:
@@ -46,6 +46,7 @@ class Tile(pygame.sprite.Sprite):
                               number_of_cards)
                 )
             )
+            number_of_cards += 1
 
     def remove_card(self, selected: Card) -> List[Card]:
         cards = []

@@ -39,6 +39,7 @@ class App:
         self.active_cards = self.game.active_cards
         self.entities = self.game.entities
 
+
         self.clicked = False
         self.selected = None
 
@@ -61,8 +62,6 @@ class App:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-
-                # TODO add resize entity realignment
 
                 if event.type == MOUSEMOTION:
                     mouse_x, mouse_y = event.pos
@@ -110,7 +109,7 @@ class App:
         # Draw Entities
         for entity in self.entities:
             # TODO: need to add z-index to prevent bad overlap CRT-2
-            screen.blit(entity.image, (entity.rect.x, entity.rect.y))
+            screen.blit(entity.surface, (entity.rect.x, entity.rect.y))
 
             # Debugging tool
             if debugging:
@@ -146,10 +145,7 @@ class App:
                 if c.rect.collidepoint(mouse_x, mouse_y):
                     # Select new card
                     if not self.selected:
-                        # Bring new card to top
-                        for i, entity in enumerate(self.entities):
-                            if entity == c:
-                                self.entities.append(self.entities.pop(i))
+                        # TODO Figure out how to do highlighting
 
                         # Set new card selected
                         self.selected = c
